@@ -4,3 +4,4 @@ pydub
 numpy
 requests
 yt-dlp
+ffmpeg-static
