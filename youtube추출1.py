@@ -1,13 +1,20 @@
 import streamlit as st
 import os
 import subprocess
+from urllib.parse import unquote
 
-# 허용된 Referrer
+# 내 블로그 주소 (예: https://best-no1.blogspot.com)
 ALLOWED_REFERRER = "best-no1.blogspot.com"
 
-# Referrer 검사 함수
+# Referrer 확인 함수
 def check_referrer():
-    referrer = st.request.headers.get("Referer", "")
+    referrer = st.experimental_get_query_params().get("referrer", [""])[0]
+    referrer = unquote(referrer)
+
+    # 디버깅용: Referrer 표시
+    st.write(f"디코딩된 Referrer: {referrer}")
+
+    # Referrer가 허용된 주소에서 온 경우에만 True 반환
     if ALLOWED_REFERRER in referrer:
         return True
     else:
@@ -26,18 +33,21 @@ if check_referrer():
             st.error("URL과 파일 이름을 모두 입력해주세요.")
         else:
             try:
+                # 유튜브 오디오 다운로드 (yt-dlp 사용)
                 temp_file = f"{output_name}.webm"
                 command_download = [
                     "yt-dlp", "-f", "bestaudio", "--output", temp_file, url
                 ]
                 subprocess.run(command_download, check=True)
 
+                # FFmpeg를 사용하여 MP3로 변환
                 output_file = f"{output_name}.mp3"
                 command_convert = [
                     "ffmpeg", "-i", temp_file, "-q:a", "0", "-map", "a", output_file
                 ]
                 subprocess.run(command_convert, check=True)
 
+                # 임시 파일 삭제
                 os.remove(temp_file)
                 st.success(f"MP3 파일 생성 완료: {output_file}")
                 st.download_button(label="MP3 파일 다운로드", data=open(output_file, "rb"), file_name=f"{output_name}.mp3")
