@@ -7,7 +7,7 @@ ALLOWED_REFERRER = "bestno1.blogspot.com"
 
 def check_referrer():
     # URL 쿼리 파라미터로 전달된 referrer 확인
-    referrer = st.experimental_get_query_params().get("referrer", [""])[0]
+    referrer = st.session_state.get("referrer", [""])[0]
     
     # Referrer 확인
     if ALLOWED_REFERRER in referrer or referrer == ALLOWED_REFERRER:
