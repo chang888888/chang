@@ -1,55 +1,32 @@
 import streamlit as st
+from pytube import YouTube
+from pydub import AudioSegment
 import os
-import subprocess
 
-# 내 블로그 주소 (예: https://best-no1.blogspot.com)
-# ALLOWED_REFERRER = "https://best-no1.blogspot.com"
+st.title("YouTube to MP3 Converter")
 
-# Referrer 체크 해제
-def check_referrer():
-    # 블로그 제한 해제
-    return True
+url = st.text_input("YouTube URL을 입력하세요:")
+output_name = st.text_input("파일 이름 (확장자 없이):")
 
-    # 아래 코드를 주석 처리하면 모든 환경에서 작동합니다.
-    # referrer = st.query_params.get("referrer", [""])[0]
-    # referrer = unquote(referrer)
-    # st.write("디코딩된 Referrer:", referrer)
-    # if ALLOWED_REFERRER in referrer or referrer.startswith(ALLOWED_REFERRER):
-    #     return True
-    # else:
-    #     st.error("이 프로그램은 해당 블로그에서만 사용할 수 있습니다.")
-    #     return False
+if st.button("MP3 다운로드"):
+    if not url or not output_name:
+        st.error("URL과 파일 이름을 모두 입력해주세요.")
+    else:
+        try:
+            # YouTube 비디오 다운로드 (Pytube 사용)
+            yt = YouTube(url)
+            stream = yt.streams.filter(only_audio=True).first()
+            download_path = stream.download(filename=f"{output_name}.mp4")
+            
+            # MP4를 MP3로 변환 (Pydub 사용)
+            audio = AudioSegment.from_file(download_path)
+            output_file = f"{output_name}.mp3"
+            audio.export(output_file, format="mp3")
 
-# Referrer 확인
-if check_referrer():
-    st.title("YouTube to MP3 Converter")
+            # 임시 파일 삭제
+            os.remove(download_path)
+            st.success(f"MP3 파일 생성 완료: {output_file}")
+            st.download_button(label="MP3 파일 다운로드", data=open(output_file, "rb"), file_name=f"{output_name}.mp3")
 
-    url = st.text_input("YouTube URL을 입력하세요:")
-    output_name = st.text_input("파일 이름 (확장자 없이):")
-
-    if st.button("MP3 다운로드"):
-        if not url or not output_name:
-            st.error("URL과 파일 이름을 모두 입력해주세요.")
-        else:
-            try:
-                # 유튜브 오디오 다운로드 (yt-dlp 사용)
-                temp_file = f"{output_name}.webm"
-                command_download = [
-                    "yt-dlp", "-f", "bestaudio", "--output", temp_file, url
-                ]
-                subprocess.run(command_download, check=True)
-
-                # FFmpeg를 사용하여 MP3로 변환
-                output_file = f"{output_name}.mp3"
-                command_convert = [
-                    "ffmpeg", "-i", temp_file, "-q:a", "0", "-map", "a", output_file
-                ]
-                subprocess.run(command_convert, check=True)
-
-                # 임시 파일 삭제
-                os.remove(temp_file)
-                st.success(f"MP3 파일 생성 완료: {output_file}")
-                st.download_button(label="MP3 파일 다운로드", data=open(output_file, "rb"), file_name=f"{output_name}.mp3")
-
-            except Exception as e:
-                st.error(f"오류 발생: {e}")
+        except Exception as e:
+            st.error(f"오류 발생: {e}")
