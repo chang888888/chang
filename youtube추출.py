@@ -3,7 +3,7 @@ import os
 import subprocess
 
 # 내 블로그 주소 (예: https://bestno1.blogspot.com)
-ALLOWED_REFERRER = "bestno1.blogspot.com"
+ALLOWED_REFERRER = "best-no1.blogspot.com"
 
 def check_referrer():
     # URL 쿼리 파라미터로 전달된 referrer 확인
