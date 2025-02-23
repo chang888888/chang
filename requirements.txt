@@ -1,7 +1,6 @@
-streamlit
+streamlit==1.25.0
+yt-dlp==2023.1.1
 pytube==11.0.1
-pydub
-numpy
-requests
-yt-dlp
-ffmpeg-static
+pydub==0.25.1
+numpy==1.22.0
+requests==2.31.0
