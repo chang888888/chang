@@ -1,15 +1,8 @@
 import streamlit as st
 from pytube import YouTube
-from pydub import AudioSegment
 import os
-import requests
+from pydub import AudioSegment
 
-# User-Agent 설정
-headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
-}
-
-# Streamlit UI
 st.title("YouTube to MP3 Converter")
 
 url = st.text_input("YouTube URL을 입력하세요:")
@@ -20,20 +13,13 @@ if st.button("MP3 다운로드"):
         st.error("URL과 파일 이름을 모두 입력해주세요.")
     else:
         try:
-            # URL 확인
-            response = requests.get(url, headers=headers)
-            if response.status_code != 200:
-                st.error("유효하지 않은 URL입니다. 다시 확인해주세요.")
-                st.stop()
-
-            # 유튜브 오디오 다운로드
+            # YouTube에서 비디오 다운로드 (MP4)
             yt = YouTube(url)
             stream = yt.streams.filter(only_audio=True).first()
-            temp_file = f"{output_name}.mp4"
-            stream.download(filename=temp_file)
+            temp_file = stream.download(filename=f"{output_name}.mp4")
 
-            # MP4를 MP3로 변환
-            audio = AudioSegment.from_file(temp_file, format="mp4")
+            # MP3로 변환
+            audio = AudioSegment.from_file(temp_file)
             output_file = f"{output_name}.mp3"
             audio.export(output_file, format="mp3")
 
