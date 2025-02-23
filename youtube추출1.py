@@ -3,23 +3,34 @@ import os
 import subprocess
 from urllib.parse import unquote
 
-# 블로그 주소
+# 허용된 Referrer와 User-Agent 목록
 ALLOWED_REFERRER = "https://best-no1.blogspot.com"
+ALLOWED_USER_AGENTS = [
+    "Mozilla", "Chrome", "Safari", "Edge", "Firefox"
+]
 
-def check_referrer():
-    # URL 쿼리 파라미터로 전달된 referrer 확인
+def check_referrer_and_user_agent():
+    # Referrer 확인
     referrer = st.experimental_get_query_params().get("referrer", [""])[0]
     referrer = unquote(referrer)
-    
-    # Referrer 확인 및 URL 복사 방지
-    if referrer == ALLOWED_REFERRER:
-        return True
-    else:
+
+    # User-Agent 확인
+    user_agent = st.request.headers.get("User-Agent", "")
+
+    # Referrer가 올바른지 확인
+    if referrer != ALLOWED_REFERRER:
         st.error("이 프로그램은 해당 블로그에서만 사용할 수 있습니다.")
         return False
 
-# Referrer 확인
-if check_referrer():
+    # User-Agent가 허용된 브라우저인지 확인
+    if not any(agent in user_agent for agent in ALLOWED_USER_AGENTS):
+        st.error("올바른 브라우저에서만 접근 가능합니다.")
+        return False
+
+    return True
+
+# Referrer와 User-Agent 확인
+if check_referrer_and_user_agent():
     st.title("YouTube to MP3 Converter")
 
     url = st.text_input("YouTube URL을 입력하세요:")
