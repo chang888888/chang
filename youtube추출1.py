@@ -16,8 +16,12 @@ def download_video(url, output_name):
             "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/108.0.0.0 Safari/537.36"
         }
         
-        # YouTube에서 비디오 정보 가져오기
-        yt = YouTube(url, headers=headers)
+        # requests 세션 설정
+        session = requests.Session()
+        session.headers.update(headers)
+
+        # YouTube 객체 생성
+        yt = YouTube(url)
         stream = yt.streams.filter(only_audio=True).first()
         temp_file = stream.download(filename=f"{output_name}.mp4")
 
