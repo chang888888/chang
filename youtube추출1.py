@@ -3,11 +3,17 @@ from pytube import YouTube
 from pydub import AudioSegment
 import os
 import requests
+import re
 
 # User-Agent 설정
 headers = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
 }
+
+# URL 유효성 검사
+def is_valid_youtube_url(url):
+    pattern = r"^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$"
+    return re.match(pattern, url)
 
 st.title("YouTube to MP3 Converter")
 
@@ -17,6 +23,8 @@ output_name = st.text_input("파일 이름 (확장자 없이):")
 if st.button("MP3 다운로드"):
     if not url or not output_name:
         st.error("URL과 파일 이름을 모두 입력해주세요.")
+    elif not is_valid_youtube_url(url):
+        st.error("올바른 YouTube URL을 입력하세요.")
     else:
         try:
             # YouTube 비디오 다운로드 (Pytube 사용)
