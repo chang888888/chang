@@ -2,12 +2,12 @@ import streamlit as st
 from pytube import YouTube
 from pydub import AudioSegment
 import os
-from pytube.request import default_range_header
+import requests
 
 # User-Agent 설정
-import requests
-from pytube import request
-request.default_range_header = lambda *args, **kwargs: {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"}
+headers = {
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
+}
 
 st.title("YouTube to MP3 Converter")
 
