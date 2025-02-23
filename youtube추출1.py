@@ -1,21 +1,16 @@
 import streamlit as st
 import os
 import subprocess
-from urllib.parse import unquote
 
-# 내 블로그 주소 (예: https://best-no1.blogspot.com)
-ALLOWED_REFERRER = "best-no1.blogspot.com"
+# 허용할 블로그 주소
+ALLOWED_REFERRER = "https://best-no1.blogspot.com"
 
-# Referrer 확인 함수
 def check_referrer():
+    # Streamlit에서 referrer 확인
     referrer = st.experimental_get_query_params().get("referrer", [""])[0]
-    referrer = unquote(referrer)
-
-    # 디버깅용: Referrer 표시
-    st.write(f"디코딩된 Referrer: {referrer}")
-
-    # Referrer가 허용된 주소에서 온 경우에만 True 반환
-    if ALLOWED_REFERRER in referrer:
+    
+    # Referrer가 블로그에서 온 경우만 True 반환
+    if ALLOWED_REFERRER in referrer or referrer.startswith(ALLOWED_REFERRER):
         return True
     else:
         st.error("이 프로그램은 해당 블로그에서만 사용할 수 있습니다.")
