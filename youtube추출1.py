@@ -2,25 +2,64 @@ import streamlit as st
 import os
 import subprocess
 from urllib.parse import unquote
+import random
+import string
+import time
 
 # 허용된 Referrer
 ALLOWED_REFERRER = "https://best-no1.blogspot.com"
 
-# Referrer 체크 함수
-def check_referrer():
-    # URL 파라미터에서 Referrer 확인
-    referrer = st.experimental_get_query_params().get("referrer", [""])[0]
-    referrer = unquote(referrer)
+# 임시 토큰 저장
+tokens = {}
 
-    # Referrer가 허용된 주소와 일치하지 않으면 접근 차단
+# 임시 토큰 생성 함수
+def generate_token():
+    token = ''.join(random.choices(string.ascii_letters + string.digits, k=20))
+    tokens[token] = time.time()
+    return token
+
+# 토큰 유효성 검사 함수
+def validate_token(token):
+    # 토큰 존재 확인
+    if token not in tokens:
+        return False
+
+    # 토큰 유효기간 확인 (5분)
+    if time.time() - tokens[token] > 300:
+        del tokens[token]  # 만료된 토큰 삭제
+        return False
+
+    # 유효한 토큰
+    return True
+
+# Referrer와 토큰 검사
+def check_referrer_and_token():
+    # URL 파라미터에서 Referrer와 Token 확인
+    query_params = st.experimental_get_query_params()
+    referrer = query_params.get("referrer", [""])[0]
+    referrer = unquote(referrer)
+    token = query_params.get("token", [""])[0]
+
+    # Referrer 검사
     if referrer != ALLOWED_REFERRER:
         st.error("이 프로그램은 해당 블로그에서만 사용할 수 있습니다.")
         return False
 
+    # 토큰 검사
+    if not validate_token(token):
+        st.error("접근 권한이 유효하지 않습니다. 블로그에서 다시 접속하세요.")
+        return False
+
     return True
 
-# Referrer 체크 통과 시에만 페이지 표시
-if check_referrer():
+# 토큰 생성 및 URL 생성
+def generate_url():
+    token = generate_token()
+    url = f"https://youtube-mp3-converter.streamlit.app/?referrer={ALLOWED_REFERRER}&token={token}"
+    return url
+
+# Referrer와 Token 검사 통과 시에만 페이지 표시
+if check_referrer_and_token():
     st.title("YouTube to MP3 Converter")
 
     url = st.text_input("YouTube URL을 입력하세요:")
