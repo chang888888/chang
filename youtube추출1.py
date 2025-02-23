@@ -3,18 +3,13 @@ from pytube import YouTube
 from pydub import AudioSegment
 import os
 import requests
-import re
 
 # User-Agent 설정
 headers = {
-    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/109.0.0.0 Safari/537.36"
+    "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/91.0.4472.124 Safari/537.36"
 }
 
-# URL 유효성 검사
-def is_valid_youtube_url(url):
-    pattern = r"^(https?\:\/\/)?(www\.youtube\.com|youtu\.?be)\/.+$"
-    return re.match(pattern, url)
-
+# Streamlit UI
 st.title("YouTube to MP3 Converter")
 
 url = st.text_input("YouTube URL을 입력하세요:")
@@ -23,22 +18,27 @@ output_name = st.text_input("파일 이름 (확장자 없이):")
 if st.button("MP3 다운로드"):
     if not url or not output_name:
         st.error("URL과 파일 이름을 모두 입력해주세요.")
-    elif not is_valid_youtube_url(url):
-        st.error("올바른 YouTube URL을 입력하세요.")
     else:
         try:
-            # YouTube 비디오 다운로드 (Pytube 사용)
+            # URL 확인
+            response = requests.get(url, headers=headers)
+            if response.status_code != 200:
+                st.error("유효하지 않은 URL입니다. 다시 확인해주세요.")
+                st.stop()
+
+            # 유튜브 오디오 다운로드
             yt = YouTube(url)
             stream = yt.streams.filter(only_audio=True).first()
-            download_path = stream.download(filename=f"{output_name}.mp4")
-            
-            # MP4를 MP3로 변환 (Pydub 사용)
-            audio = AudioSegment.from_file(download_path)
+            temp_file = f"{output_name}.mp4"
+            stream.download(filename=temp_file)
+
+            # MP4를 MP3로 변환
+            audio = AudioSegment.from_file(temp_file, format="mp4")
             output_file = f"{output_name}.mp3"
             audio.export(output_file, format="mp3")
 
             # 임시 파일 삭제
-            os.remove(download_path)
+            os.remove(temp_file)
             st.success(f"MP3 파일 생성 완료: {output_file}")
             st.download_button(label="MP3 파일 다운로드", data=open(output_file, "rb"), file_name=f"{output_name}.mp3")
 
