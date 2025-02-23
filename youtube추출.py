@@ -2,12 +2,12 @@ import streamlit as st
 import os
 import subprocess
 
-# 내 블로그 주소 (예: https://bestno1.blogspot.com)
+# 내 블로그 주소 (예: https://best-no1.blogspot.com)
 ALLOWED_REFERRER = "https://best-no1.blogspot.com"
 
 def check_referrer():
     # URL 쿼리 파라미터로 전달된 referrer 확인
-    referrer = st.session_state.get("referrer", [""])[0]
+    referrer = st.query_params.get("referrer", [""])[0]
     
     # Referrer 확인
     if ALLOWED_REFERRER in referrer or referrer.startswith(ALLOWED_REFERRER):
