@@ -1,39 +1,24 @@
 import streamlit as st
 import os
 import subprocess
-from urllib.parse import unquote
 
 # 내 블로그 주소 (예: https://best-no1.blogspot.com)
-ALLOWED_REFERRER = "https://best-no1.blogspot.com"
+# ALLOWED_REFERRER = "https://best-no1.blogspot.com"
 
-# JavaScript로 해시 파라미터를 쿼리 파라미터로 변환
-st.markdown("""
-<script>
-    if (window.location.hash) {
-        const hashParams = new URLSearchParams(window.location.hash.substring(1));
-        const referrer = hashParams.get('referrer');
-        if (referrer) {
-            const newUrl = window.location.origin + window.location.pathname + '?referrer=' + encodeURIComponent(referrer);
-            window.location.href = newUrl;
-        }
-    }
-</script>
-""", unsafe_allow_html=True)
-
+# Referrer 체크 해제
 def check_referrer():
-    # URL 쿼리 파라미터로 전달된 referrer 확인 (디코딩 포함)
-    referrer = st.query_params.get("referrer", [""])[0]
-    referrer = unquote(referrer)  # URL 디코딩
-    
-    # 디버그용 (Referrer 정보 확인)
-    st.write("디코딩된 Referrer:", referrer)
-    
-    # Referrer 확인
-    if ALLOWED_REFERRER in referrer or referrer.startswith(ALLOWED_REFERRER):
-        return True
-    else:
-        st.error("이 프로그램은 해당 블로그에서만 사용할 수 있습니다.")
-        return False
+    # 블로그 제한 해제
+    return True
+
+    # 아래 코드를 주석 처리하면 모든 환경에서 작동합니다.
+    # referrer = st.query_params.get("referrer", [""])[0]
+    # referrer = unquote(referrer)
+    # st.write("디코딩된 Referrer:", referrer)
+    # if ALLOWED_REFERRER in referrer or referrer.startswith(ALLOWED_REFERRER):
+    #     return True
+    # else:
+    #     st.error("이 프로그램은 해당 블로그에서만 사용할 수 있습니다.")
+    #     return False
 
 # Referrer 확인
 if check_referrer():
