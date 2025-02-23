@@ -6,9 +6,11 @@ import subprocess
 ALLOWED_REFERRER = "bestno1.blogspot.com"
 
 def check_referrer():
-    # Streamlit에서 HTTP 헤더 가져오기
-    referrer = st.query_params.get("referrer", [""])[0]
-    if ALLOWED_REFERRER in referrer:
+    # URL 쿼리 파라미터로 전달된 referrer 확인
+    referrer = st.experimental_get_query_params().get("referrer", [""])[0]
+    
+    # Referrer 확인
+    if ALLOWED_REFERRER in referrer or referrer == ALLOWED_REFERRER:
         return True
     else:
         st.error("이 프로그램은 해당 블로그에서만 사용할 수 있습니다.")
