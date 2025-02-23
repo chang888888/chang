@@ -1,15 +1,14 @@
 import streamlit as st
 import os
 import subprocess
-from urllib.parse import urlparse
 
 # 허용된 Referrer
 ALLOWED_REFERRER = "best-no1.blogspot.com"
 
-# Referrer 확인 함수
+# Referrer 검사 함수
 def check_referrer():
-    referrer = st.experimental_get_query_params().get("referrer", [""])[0]
-    if ALLOWED_REFERRER in urlparse(referrer).netloc:
+    referrer = st.request.headers.get("Referer", "")
+    if ALLOWED_REFERRER in referrer:
         return True
     else:
         st.error("이 프로그램은 해당 블로그에서만 사용할 수 있습니다.")
