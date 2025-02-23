@@ -1,5 +1,5 @@
 streamlit
-pytube==11.0.1
+yt-dlp
 pydub
 numpy
 requests
