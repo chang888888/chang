@@ -6,6 +6,20 @@ from urllib.parse import unquote
 # 내 블로그 주소 (예: https://best-no1.blogspot.com)
 ALLOWED_REFERRER = "https://best-no1.blogspot.com"
 
+# JavaScript로 해시 파라미터를 쿼리 파라미터로 변환
+st.markdown("""
+<script>
+    if (window.location.hash) {
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        const referrer = hashParams.get('referrer');
+        if (referrer) {
+            const newUrl = window.location.origin + window.location.pathname + '?referrer=' + encodeURIComponent(referrer);
+            window.location.href = newUrl;
+        }
+    }
+</script>
+""", unsafe_allow_html=True)
+
 def check_referrer():
     # URL 쿼리 파라미터로 전달된 referrer 확인 (디코딩 포함)
     referrer = st.query_params.get("referrer", [""])[0]
