@@ -10,7 +10,7 @@ def check_referrer():
     referrer = st.session_state.get("referrer", [""])[0]
     
     # Referrer 확인
-    if ALLOWED_REFERRER in referrer or referrer == ALLOWED_REFERRER:
+    if ALLOWED_REFERRER in referrer or referrer.startswith(ALLOWED_REFERRER):
         return True
     else:
         st.error("이 프로그램은 해당 블로그에서만 사용할 수 있습니다.")
