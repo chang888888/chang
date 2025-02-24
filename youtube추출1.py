@@ -31,7 +31,7 @@ if check_referrer():
     url = st.text_input("YouTube URL을 입력하세요:")
     output_name = st.text_input("파일 이름 (확장자 없이):")
 
-    if st.button("MP3 다운로드"):
+    if st.button("MP3 파일변환"):
         if not url or not output_name:
             st.error("URL과 파일 이름을 모두 입력해주세요.")
         else:
