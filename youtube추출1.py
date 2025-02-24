@@ -35,7 +35,7 @@ def validate_token(token):
 # Referrer와 Token 검사
 def check_referrer_and_token():
     # URL 파라미터에서 Referrer와 Token 확인
-    query_params = st.experimental_get_query_params()
+    query_params = st.query_params  # ✅ 최신 방식으로 수정
     referrer = query_params.get("referrer", [""])[0]
     referrer = unquote(referrer)
     token = query_params.get("token", [""])[0]
@@ -54,7 +54,7 @@ def check_referrer_and_token():
 
 # URL 생성 및 리다이렉트 처리
 def handle_url_generation():
-    query_params = st.experimental_get_query_params()
+    query_params = st.query_params  # ✅ 최신 방식으로 수정
     if "generate_url" in query_params:
         # 새로운 UUID 토큰 생성
         new_token = generate_token()
