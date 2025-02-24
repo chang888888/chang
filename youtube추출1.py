@@ -6,8 +6,11 @@ import subprocess
 ALLOWED_REFERRER = "https://best-no1.blogspot.com"
 
 def check_referrer():
-    # Referrer 확인 (experimental_get_query_params -> query_params 수정)
-    referrer = st.query_params.get("referrer", [""])[0]
+    # Referrer 확인 (experimental_get_query_params 사용)
+    referrer = st.experimental_get_query_params().get("referrer", [""])[0]
+
+    # 디버깅: Referrer 값 출력
+    st.write(f"디버깅 - Referrer: {referrer}")
 
     # Referrer가 블로그에서 온 경우만 True 반환
     if ALLOWED_REFERRER in referrer or referrer.startswith(ALLOWED_REFERRER):
