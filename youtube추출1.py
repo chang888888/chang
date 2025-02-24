@@ -8,62 +8,41 @@ import time
 # ✅ 최신 Streamlit 방식 적용
 st.set_page_config(page_title="YouTube to MP3 Converter", layout="centered")
 
-# 🔒 허용된 Referrer 및 User-Agent
-ALLOWED_REFERRER = "https://best-no1.blogspot.com"
-ALLOWED_USER_AGENT = "Mozilla"  # Mozilla 기반 브라우저만 허용
-
-# ⏳ 임시 토큰 저장소
-tokens = {}
+# ⏳ 토큰 및 세션 상태 저장소
+TOKENS = {}
+TOKEN_EXPIRY_TIME = 86400  # 5분 (300초)
 
 # 🎫 UUID 토큰 생성 함수
 def generate_token():
     token = str(uuid.uuid4())
-    tokens[token] = time.time()
+    TOKENS[token] = time.time()
     return token
 
 # ✅ 토큰 유효성 검사 함수
 def validate_token(token):
     # 토큰이 존재하지 않으면 False
-    if token not in tokens:
+    if token not in TOKENS:
         return False
 
     # 5분 이내에만 유효
-    if time.time() - tokens[token] > 300:
-        del tokens[token]  # 만료된 토큰 삭제
-        return False
-
-    # 유효한 토큰은 사용 후 삭제
-    del tokens[token]
-    return True
-
-# 🔐 Referrer와 Token 검사
-def check_referrer_and_token():
-    # URL 파라미터에서 Referrer와 Token 확인
-    query_params = st.experimental_get_query_params()
-    referrer = query_params.get("referrer", [""])[0]
-    referrer = unquote(referrer)
-    token = query_params.get("token", [""])[0]
-
-    # Referrer 검사
-    if not referrer.startswith(ALLOWED_REFERRER):
-        st.error("이 프로그램은 해당 블로그에서만 사용할 수 있습니다.")
-        return False
-
-    # 토큰 검사
-    if not validate_token(token):
-        st.error("접근 권한이 유효하지 않습니다. 블로그에서 다시 접속하세요.")
+    if time.time() - TOKENS[token] > TOKEN_EXPIRY_TIME:
+        del TOKENS[token]  # 만료된 토큰 삭제
         return False
 
     return True
 
-# 🚀 URL 생성 및 리다이렉트 처리
+# 🔐 세션 상태 초기화
+if 'is_valid_session' not in st.session_state:
+    st.session_state.is_valid_session = False
+
+# 🔄 URL 생성 및 리다이렉트 처리
 def handle_url_generation():
     query_params = st.experimental_get_query_params()
     if "generate_url" in query_params:
         # 새로운 UUID 토큰 생성
         new_token = generate_token()
         # 새 URL 생성
-        new_url = f"https://youtube-mp3-converter.streamlit.app/?referrer={quote(ALLOWED_REFERRER)}&token={new_token}"
+        new_url = f"https://youtube-mp3-converter.streamlit.app/?token={new_token}"
         # URL 리다이렉트
         st.markdown(f'<meta http-equiv="refresh" content="0; URL={new_url}">', unsafe_allow_html=True)
         st.stop()
@@ -71,8 +50,23 @@ def handle_url_generation():
 # 🔄 URL 생성 처리
 handle_url_generation()
 
+# 🔒 Token 및 Session State 검사
+def check_token_and_session():
+    query_params = st.experimental_get_query_params()
+    token = query_params.get("token", [""])[0]
+
+    # 토큰 검사
+    if validate_token(token):
+        # 세션 상태 활성화
+        st.session_state.is_valid_session = True
+        # 사용된 토큰 삭제 (1회용)
+        del TOKENS[token]
+    else:
+        st.error("잘못된 접근입니다. 블로그에서 다시 접속하세요.")
+        st.stop()
+
 # 🚦 Streamlit 앱 본문
-if check_referrer_and_token():
+if st.session_state.is_valid_session:
     st.title("YouTube to MP3 Converter")
 
     url = st.text_input("YouTube URL을 입력하세요:")
@@ -105,4 +99,4 @@ if check_referrer_and_token():
             except Exception as e:
                 st.error(f"오류 발생: {e}")
 else:
-    st.error("잘못된 접근입니다.")
+    check_token_and_session()
