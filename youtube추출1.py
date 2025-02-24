@@ -6,9 +6,9 @@ import subprocess
 ALLOWED_REFERRER = "https://best-no1.blogspot.com"
 
 def check_referrer():
-    # Streamlit에서 referrer 확인
-    referrer = st.experimental_get_query_params().get("referrer", [""])[0]
-    
+    # Referrer 확인 (experimental_get_query_params -> query_params 수정)
+    referrer = st.query_params.get("referrer", [""])[0]
+
     # Referrer가 블로그에서 온 경우만 True 반환
     if ALLOWED_REFERRER in referrer or referrer.startswith(ALLOWED_REFERRER):
         return True
