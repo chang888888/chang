@@ -6,8 +6,13 @@ import subprocess
 ALLOWED_REFERRER = "https://best-no1.blogspot.com"
 
 def check_referrer():
-    # Referrer 확인 (experimental_get_query_params 사용)
-    referrer = st.experimental_get_query_params().get("referrer", [""])[0]
+    # Referrer 확인 (st.query_params 사용)
+    query_params = st.query_params
+    referrer = query_params.get("referrer", "")
+
+    # 리스트일 경우 첫 번째 값 가져오기
+    if isinstance(referrer, list):
+        referrer = referrer[0]
 
     # 디버깅: Referrer 값 출력
     st.write(f"디버깅 - Referrer: {referrer}")
