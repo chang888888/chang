@@ -5,20 +5,23 @@ from urllib.parse import unquote, quote
 import uuid
 import time
 
-# 허용된 Referrer 및 User-Agent
+# ✅ 최신 Streamlit 방식 적용
+st.set_page_config(page_title="YouTube to MP3 Converter", layout="centered")
+
+# 🔒 허용된 Referrer 및 User-Agent
 ALLOWED_REFERRER = "https://best-no1.blogspot.com"
 ALLOWED_USER_AGENT = "Mozilla"  # Mozilla 기반 브라우저만 허용
 
-# 임시 토큰 저장소
+# ⏳ 임시 토큰 저장소
 tokens = {}
 
-# UUID 토큰 생성 함수
+# 🎫 UUID 토큰 생성 함수
 def generate_token():
     token = str(uuid.uuid4())
     tokens[token] = time.time()
     return token
 
-# 토큰 유효성 검사 함수
+# ✅ 토큰 유효성 검사 함수
 def validate_token(token):
     # 토큰이 존재하지 않으면 False
     if token not in tokens:
@@ -33,10 +36,10 @@ def validate_token(token):
     del tokens[token]
     return True
 
-# Referrer와 Token 검사
+# 🔐 Referrer와 Token 검사
 def check_referrer_and_token():
     # URL 파라미터에서 Referrer와 Token 확인
-    query_params = st.experimental_get_query_params()  # ✅ 최신 방식 사용
+    query_params = st.experimental_get_query_params()
     referrer = query_params.get("referrer", [""])[0]
     referrer = unquote(referrer)
     token = query_params.get("token", [""])[0]
@@ -53,9 +56,9 @@ def check_referrer_and_token():
 
     return True
 
-# URL 생성 및 리다이렉트 처리
+# 🚀 URL 생성 및 리다이렉트 처리
 def handle_url_generation():
-    query_params = st.experimental_get_query_params()  # ✅ 최신 방식 사용
+    query_params = st.experimental_get_query_params()
     if "generate_url" in query_params:
         # 새로운 UUID 토큰 생성
         new_token = generate_token()
@@ -65,10 +68,10 @@ def handle_url_generation():
         st.markdown(f'<meta http-equiv="refresh" content="0; URL={new_url}">', unsafe_allow_html=True)
         st.stop()
 
-# URL 생성 처리
+# 🔄 URL 생성 처리
 handle_url_generation()
 
-# Streamlit 앱 본문
+# 🚦 Streamlit 앱 본문
 if check_referrer_and_token():
     st.title("YouTube to MP3 Converter")
 
