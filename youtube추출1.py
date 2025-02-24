@@ -52,7 +52,22 @@ def check_referrer_and_token():
 
     return True
 
-# Streamlit 앱
+# URL 생성 및 리다이렉트 처리
+def handle_url_generation():
+    query_params = st.experimental_get_query_params()
+    if "generate_url" in query_params:
+        # 새로운 UUID 토큰 생성
+        new_token = generate_token()
+        # 새 URL 생성
+        new_url = f"https://youtube-mp3-converter.streamlit.app/?referrer={ALLOWED_REFERRER}&token={new_token}"
+        # URL 리다이렉트
+        st.markdown(f'<meta http-equiv="refresh" content="0; URL={new_url}">', unsafe_allow_html=True)
+        st.stop()
+
+# URL 생성 처리
+handle_url_generation()
+
+# Streamlit 앱 본문
 if check_referrer_and_token():
     st.title("YouTube to MP3 Converter")
 
